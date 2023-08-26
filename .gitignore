@@ -1,0 +1,5 @@
+.venv
+notebooks/model_alt copy.ipynb
+notebooks/testing.ipynb
+api/__pycache__/app.cpython-311.pyc
+api/__pycache__/main.cpython-311.pyc
