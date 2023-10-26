@@ -26,13 +26,15 @@ class GraphSAGE(nn.Module):
 app = Flask(__name__)
 
 # Load the saved model and other data
-model_path = "../model/dgl_model.pt"
-model = torch.load(model_path, map_location=torch.device('cpu'))
+model_path = "./dgl_model.pt"
+
+model = GraphSAGE(224,16)
+model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
 model.eval()
 
 # Load author data and prepare necessary data structures
 # ...
-author_ids = pd.read_csv('../data/author_id.csv')
+author_ids = pd.read_csv('./data/author_id.csv')
 author_id_to_number = {author_id: idx for idx, author_id in enumerate(author_ids['Author'])}
 author_num_to_id = {v: k for k, v in author_id_to_number.items()}
 
@@ -62,7 +64,7 @@ def predict():
     
     if input_author_id is None:
         return jsonify({"error": "Missing author_id parameter"}), 400
-    dataset = dgl.data.CSVDataset('../data/author_data')
+    dataset = dgl.data.CSVDataset('./data/author_data')
     g = dataset[0]
     g = dgl.add_self_loop(g)
     top_coauthors, likeliness_scores = get_top_coauthors(input_author_id, model, g, author_id_to_number, author_num_to_id)
