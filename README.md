@@ -1,5 +1,3 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/HYsM084i)
-
 <h3 align="center">Co-author prediction</h3>
 
 <div align="center">
@@ -29,7 +27,7 @@ A graph neural network which uses a neo4j database for link prediction
 
 ## 🧐 About <a name = "about"></a>
 
-A graph neural network which predicts upto n number of co-authors, one particular author would want to work with. This model has been leveraged in the form of a notebook, python script and a flask api, all of which will be explained in their respective sections ahead.
+A graph neural network which predicts upto n number of co-authors, one particular author would want to work with. This model has been leveraged in the form of a notebook, python script and a flask api, all of which will be explained in their respective sections ahead. The data was extracted fro a neo4j dump and converted to a custom deep graph db for training. 
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
 
