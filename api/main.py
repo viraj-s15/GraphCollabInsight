@@ -10,6 +10,7 @@ import pandas as pd
 
 # Define the GraphSAGE class and other functions/constants from your original code
 
+
 class GraphSAGE(nn.Module):
     def __init__(self, in_feats, h_feats):
         super(GraphSAGE, self).__init__()
@@ -22,32 +23,37 @@ class GraphSAGE(nn.Module):
         h = self.conv2(g, h)
         return h
 
+
 # Initialize Flask
 app = Flask(__name__)
 
 # Load the saved model and other data
 model_path = "./dgl_model.pt"
 
-model = GraphSAGE(224,16)
-model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+model = GraphSAGE(224, 16)
+model.load_state_dict(torch.load(model_path, map_location=torch.device("cpu")))
 model.eval()
 
 # Load author data and prepare necessary data structures
 # ...
-author_ids = pd.read_csv('./data/author_id.csv')
-author_id_to_number = {author_id: idx for idx, author_id in enumerate(author_ids['Author'])}
+author_ids = pd.read_csv("./data/author_id.csv")
+author_id_to_number = {
+    author_id: idx for idx, author_id in enumerate(author_ids["Author"])
+}
 author_num_to_id = {v: k for k, v in author_id_to_number.items()}
 
-def get_top_coauthors(author_id, model, g, author_id_to_number, author_num_to_id, num_top_coauthors=5):
+
+def get_top_coauthors(
+    author_id, model, g, author_id_to_number, author_num_to_id, num_top_coauthors=10
+):
     if author_id not in author_id_to_number:
         print("Invalid author ID. Please provide a valid author ID.")
         return [], []
-    
+
     author_number = author_id_to_number[author_id]
-    
+
     with torch.no_grad():
-        
-        h = model(g, g.ndata['feat'].type(torch.float32))
+        h = model(g, g.ndata["feat"].type(torch.float32))
         author_embedding = h[author_number]
 
         similarity_scores = torch.cosine_similarity(author_embedding, h, dim=1)
@@ -58,16 +64,18 @@ def get_top_coauthors(author_id, model, g, author_id_to_number, author_num_to_id
         return top_coauthors, likeliness_scores
 
 
-@app.route('/get_possible_coauthors', methods=['GET'])
+@app.route("/get_possible_coauthors", methods=["GET"])
 def predict():
-    input_author_id = request.args.get('author_id')
-    
+    input_author_id = request.args.get("author_id")
+
     if input_author_id is None:
         return jsonify({"error": "Missing author_id parameter"}), 400
-    dataset = dgl.data.CSVDataset('./data/author_data')
+    dataset = dgl.data.CSVDataset("./data/author_data")
     g = dataset[0]
     g = dgl.add_self_loop(g)
-    top_coauthors, likeliness_scores = get_top_coauthors(input_author_id, model, g, author_id_to_number, author_num_to_id)
+    top_coauthors, likeliness_scores = get_top_coauthors(
+        input_author_id, model, g, author_id_to_number, author_num_to_id
+    )
 
     response = []
     for author_id, likeliness in zip(top_coauthors, likeliness_scores):
@@ -75,5 +83,6 @@ def predict():
 
     return jsonify(response)
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
